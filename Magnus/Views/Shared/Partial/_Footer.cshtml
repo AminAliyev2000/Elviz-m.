@@ -1,0 +1,43 @@
+﻿@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+<div class="footer">
+    <div class="header">
+        <div class="case">
+            <a href="@Url.Content("~/")">@Localizer["HOME"]</a>
+            <div>|</div>
+            <a href="@Url.Content("~/about")">@Localizer["ABOUT PROJECT"]</a>
+            <div>|</div>
+            <a href="@Url.Content("~/news")">@Localizer["NEWS"]</a>
+            <div>|</div>
+            <a href="@Url.Content("~/events")">@Localizer["EVENTS"]</a>
+            <div>|</div>
+            <a href="@Url.Content("~/outcomes")">@Localizer["OUTCOMES"]</a>
+            <div>|</div>
+            <a href="@Url.Content("~/partners")">@Localizer["PARTNERS"]</a>
+            @*<div>|</div>
+                <a href="@Url.Content("~/links")">USEFUL</a>
+                <div>|</div>
+                <a href="@Url.Content("~/blog")">BLOG</a>*@
+        </div>
+    </div>
+    <div class="text">
+        <div class="case">
+            <div class="title">
+                ERASMUS+ MAGnUS
+            </div>
+            <div class="body">
+                @Localizer["This project has been funded with support from the european commission. This website reflects the views only of the author, and the commission cannot be held responsible for any use which may be made of the information contained therein."]
+            </div>
+            <div class="follow">
+			&nbsp;
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="case">
+            © 2019 Erasmus+ MAGnUS Project. @Localizer["All rights reserved"]
+        </div>
+    </div>
+</div>
+

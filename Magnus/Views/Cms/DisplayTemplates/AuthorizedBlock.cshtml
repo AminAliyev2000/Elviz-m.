@@ -1,0 +1,10 @@
+﻿@model AuthorizedBlock
+
+@if (User?.Identity?.IsAuthenticated ?? false)
+{
+    <div class="row">
+        <div class="col-sm-12">
+                @Html.Raw(Model.Body)
+        </div>
+    </div>
+}

@@ -1,0 +1,254 @@
+﻿@model DynamicPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var actualPage = await Api.Pages.GetByIdAsync<EventPage>(Model.Id);
+
+    //var parentPage = (await Api.Pages.GetAllAsync<EventsPage>()).Where(p => p.Id == actualPage.ParentId).FirstOrDefault();
+
+    var peerPages = (await Api.Pages.GetAllAsync<EventsPage>());
+
+    var Title = actualPage.Title;
+
+
+
+    var parentTitle = "";
+    var parentPage = new DynamicPage();
+    if (actualPage.ParentId != null)
+    {
+        parentPage = await Api.Pages.GetByIdAsync(actualPage.ParentId.Value);
+
+        if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (parentPage.Regions.Languages.RusTitle.Value != null))
+        {
+            parentTitle = parentPage.Regions.Languages.RusTitle;
+        }
+        else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (parentPage.Regions.Languages.KazTitle.Value != null))
+        {
+            parentTitle = parentPage.Regions.Languages.KazTitle;
+        }
+        else
+        {
+            parentTitle = parentPage.Title;
+        }
+    }
+
+}
+<div class="meeting">
+    <div class="case">
+        <div class="meeting_text">
+            <div class="meeting_text_title">
+                @Title
+            </div>
+            <div class="meeting_text_subtitle">
+                @if (actualPage.Details.Start.Value.HasValue)
+                {
+                    <div>
+                        <span> @actualPage.Details.Start.Value?.ToShortDateString()</span>
+                        @if (actualPage.Details.Stop.Value.HasValue)
+                        {
+                            <span>&nbsp;- @actualPage.Details.Stop.Value?.ToShortDateString()</span>
+                        }
+                    </div>
+                }
+                @actualPage.Details.Place
+            </div>
+            <div class="meeting_text_body">
+
+                @if (@actualPage.Details.Image.HasValue)
+                {
+                    <div class="img">
+                        <img src="@Url.Content(actualPage.Details.Image.Resize(Api, 400))">
+                    </div>
+                }
+
+                <div class="text">
+                    @Html.DisplayFor(m => m.Blocks)
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(actualPage.Details.RegistrationUrl.Value))
+                {
+                    <div class="register">
+                        <button class="button" onclick="location.href='@actualPage.Details.RegistrationUrl.Value'">
+                            <div>
+                                @Localizer["REGISTER FOR THE EVENT"]
+                            </div>
+                        </button>
+                    </div>
+                }
+
+                @if (actualPage.Photos.Any())
+                {
+                    <div class="title_underline">
+                        @Localizer["Photos of the event"]
+                    </div>
+                    <div class="photos">
+                        @foreach (var photo in actualPage.Photos)
+                        {
+                            <div class="photo">
+                                <a href="@Url.Content(photo.Media.PublicUrl)" data-lightbox="roadtrip">
+                                    <img src="@Url.Content(photo.Resize(Api,400))" />
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+
+                @if ((actualPage.Downloads.Any()) && ((!actualPage.Details.OnlyForAuthorized.Value) || (User.Identity.IsAuthenticated)))
+                {
+                    <div class="materials">
+                        <div class="title">
+                            <div>
+                                @Localizer["Event materials"]
+                            </div>
+                            <div class="share">
+                                @*<div>
+                            Share
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-facebook.png")">
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-twitter.png")">
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-vk.png")">
+                        </div>*@
+                            </div>
+                        </div>
+                        @*@if (User?.Identity?.IsAuthenticated ?? false)
+                {
+                    <div class="material_text">
+                        @foreach (var item in actualPage.Downloads.Where(x => x.HasValue))
+                        {
+                            <div class="material">
+                                <a href="@Url.Content(item.Media.PublicUrl)">@Url.Content(item.GetTitle())</a>
+                            </div>
+                        }
+                    </div>
+                }*@
+                        <div class="material_text">
+                            @foreach (var item in actualPage.Downloads.Where(x => x.HasValue))
+                            {
+                                <div class="material">
+                                    <a href="@Url.Content(item.Media.PublicUrl)">@Url.Content(item.GetTitle())</a>
+                                </div>
+                            }
+                        </div>
+                        <div class="bottom_share">
+                            @*<div>
+                        Share
+                    </div>
+                    <div>
+                        <img src="@Url.Content("~/img_png/ic-share-facebook.png")">
+                    </div>
+                    <div>
+                        <img src="@Url.Content("~/img_png/ic-share-twitter.png")">
+                    </div>
+                    <div>
+                        <img src="@Url.Content("~/img_png/ic-share-vk.png")">
+                    </div>*@
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (actualPage.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPage.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Localizer["Events"]
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        <a href="@Url.Content("/events")">@Localizer["Events"].Value.ToUpperInvariant()</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        <a href="@Url.Content(@parentPage.Permalink)">@parentTitle.ToUpperInvariant()</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section subheader {
+    <div class="subheader">
+        <div class="case">
+            <div class="subheader_elements">
+                @foreach (var peerPage in peerPages)
+                {
+                    @if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (peerPage.Languages.RusTitle.Value != null))
+                    {
+                        @if (peerPage.Permalink == parentPage.Permalink)
+                        {
+                            <div class="subheader_element" style="background-color:#e9463f;">
+                                <a style="color:#ffffff;padding: 8px 12px 4px 12px;" href="@Url.Content(peerPage.Permalink)">@peerPage.Languages.RusTitle</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="subheader_element">
+                                <a href="@Url.Content(peerPage.Permalink)">@peerPage.Languages.RusTitle</a>
+                            </div>
+                        }
+                    }
+                    else
+                     if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (peerPage.Languages.KazTitle.Value != null))
+                    {
+                        @if (peerPage.Permalink == parentPage.Permalink)
+                        {
+                            <div class="subheader_element" style="background-color:#e9463f;">
+                                <a style="color:#ffffff;padding: 8px 12px 4px 12px;" href="@Url.Content(peerPage.Permalink)">@peerPage.Languages.KazTitle</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="subheader_element">
+                                <a href="@Url.Content(peerPage.Permalink)">@peerPage.Languages.KazTitle</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @if (peerPage.Permalink == parentPage.Permalink)
+                        {
+                            <div class="subheader_element" style="background-color:#e9463f;">
+                                <a style="color:#ffffff;padding: 8px 12px 4px 12px;" href="@Url.Content(peerPage.Permalink)">@peerPage.Title</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="subheader_element">
+                                <a href="@Url.Content(peerPage.Permalink)">@peerPage.Title</a>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}

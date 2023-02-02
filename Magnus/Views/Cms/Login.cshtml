@@ -1,0 +1,180 @@
+﻿@page
+@{
+    Layout = null;
+    ViewBag.Title = "Sign In";
+}
+
+@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.Extensions.Options
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500">
+    <link href="/css/lightbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/style.min.css?")@Guid.NewGuid()">
+
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div class="header">
+        <div class="case">
+            <div class="logos">
+                <div class="pad">
+                    <img src="@Url.Content("~/img_png/logo-erasmus.png")">
+                </div>
+                <div class="pad2">
+                    <img src="@Url.Content("~/img_png/magnus.png")">
+                </div>
+            </div>
+
+            <div class="logos_small">
+                <div class="pad">
+                    <img src="@Url.Content("~/img_png/logo-erasmus.png")">
+                </div>
+                <div class="pad2">
+                    <img src="@Url.Content("~/img_png/magnus.png")">
+                </div>
+            </div>
+
+            <div class="header_elements">
+
+
+            </div>
+
+            <div class="menu_big" id="menu_big">
+                <div>
+                    <button onclick="sidebar_open()" class="menu_button">
+                        <img src="@Url.Content("~/img_png/ic-menu-big.png")">
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu_small" id="menu_small">
+                <div>
+                    <button onclick="sidebar_open()" class="menu_button">
+                        <img src="@Url.Content("~/img_png/ic-menu.png")">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page_banner" style="background-image: url(/uploads/2cfc5624-4d1d-4034-88ce-e5f416901a18-ill-subbanner.png);">
+        <div class="text">
+            <div class="title">
+                LOGIN
+            </div>
+            <div class="subtitle">
+                <div class="body">
+                    <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                </div>
+                <div class="ic_arrow">
+                    <i class="fa fa-angle-right"></i>
+                </div>
+                <div class="body">
+                    LOGIN
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="login">
+        <div class="case">
+            <div class="login_text">
+                <div class="title">
+                    @ViewBag.Title
+                </div>
+                <div class="body">
+                    <div class="text">
+                        To access discussions use the data of the personal account created for you
+                    </div>
+
+                </div>
+
+                <div class="container" style="min-height:calc( 100vh - 595px)">
+                    <article>
+                        <div class="row">
+                            <div>
+                                <form method="post">
+                                    <input type="hidden" value="@ViewBag.ReturnUrl" />
+                                    <div class="form-group email">
+                                        @*<label>Username</label>*@
+                                        <input type="text" placeholder="Email" name="Username" class="form-control">
+                                    </div>
+                                    <div class="form-group password">
+                                        @*<label>Password</label>*@
+                                        <input type="password" placeholder="Password" name="Password" class="form-control">
+                                    </div>
+                                    <div class="send" style="padding-top:24px;">
+                                        <button type="submit" class="button">
+                                            <div>
+                                                SIGN IN
+                                            </div>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="footer">
+        <div class="header">
+        </div>
+        <div class="text">
+            <div class="case">
+                <div class="title">
+                    ERASMUS+ MAGnUS
+                </div>
+                <div class="body">
+                    @Localizer["This project has been funded with support from the european commission. This website reflects the views only of the author, and the commission cannot be held responsible for any use which may be made of the information contained therein."]
+                </div>
+                <div class="follow">
+                    Follow us on <a href="https://www.facebook.com/groups/210420736771226/"><img src="@Url.Content("~/img_png/ic-facebook.png")" style="width:20px;"></a>
+                </div>
+            </div>
+        </div>
+        <div class="bottom">
+            <div class="case">
+                © 2019 Erasmus+ MAGnUS Project. @Localizer["All rights reserved"]
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="~/js/lightbox-plus-jquery.js"></script>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (m, e, t, r, i, k, a) {
+            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+            m[i].l = 1 * new Date(); k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+        })
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(54610204, "init", {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/54610204" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+</body>
+</html>
+

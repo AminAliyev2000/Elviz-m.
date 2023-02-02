@@ -1,0 +1,376 @@
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    //var actualPage = await Api.Pages.GetByIdAsync(Model.Id);
+
+    var url = Model.Permalink;
+    var sitemap = WebApp.Site.Sitemap;
+    var peerPages = (await Api.Pages.GetAllAsync<EventsPage>());
+    // var centersPage = (await Api.Pages.GetAllAsync<CentersPage>()).FirstOrDefault();
+
+    var outcomes = (await Api.Pages.GetAllAsync<OutcomesPage>()).FirstOrDefault();
+
+    var outcomesPages = (await Api.Pages.GetAllAsync()).Where(p => p.ParentId == outcomes?.Id);
+}
+<script>
+    var width = document.body.clientWidth;
+    if (width > 1200) {
+        if (document.getElementById("mySidebar")) {
+            document.getElementById("mySidebar").style.display = "none";
+        }
+        if (document.getElementById("menu_big")) {
+            document.getElementById("menu_big").style.display = "none";
+        }
+        if (document.getElementById("menu_small")) {
+            document.getElementById("menu_small").style.display = "none";
+        }
+    }
+</script>
+
+<script>
+    function sidebar_open() {
+        document.getElementById("mySidebar").style.display = "block";
+        //document.getElementById("menu_big").style.display = "none";
+        //document.getElementById("menu_small").style.display = "none";
+    }
+
+    function sidebar_close() {
+        var width = document.body.clientWidth;
+        document.getElementById("mySidebar").style.display = "none";
+        //if ((width >= 768) && (width < 1200)) {
+        //    document.getElementById("menu_big").style.display = "block";
+        //    document.getElementById("menu_small").style.display = "none";
+        //} else if (width < 768) {
+        //    document.getElementById("menu_big").style.display = "none";
+        //    document.getElementById("menu_small").style.display = "block";
+        //} else {
+        //    document.getElementById("menu_big").style.display = "none";
+        //    document.getElementById("menu_small").style.display = "none";
+        //}
+    }
+</script>
+@if (Model is StartPage)
+{
+    <div class="corona-news">
+        The Influence of the CoronaVirus on the Realisation of the MaGnUS project - <a class="corona-link" href="news/the-influence-of-the-corona-virus-on-the-realisation-of-the-magnus-project">Learn more</a>
+    </div>
+}
+<div class="header">
+    <div class="case">
+        <div class="logos">
+            <div class="pad">
+                <img src="@Url.Content("~/img_png/logo-erasmus.png")">
+            </div>
+            <div class="pad2">
+                <img src="@Url.Content("~/img_png/magnus.png")">
+            </div>
+        </div>
+
+        <div class="logos_small">
+            <div class="pad">
+                <img src="@Url.Content("~/img_png/logo-erasmus.png")">
+            </div>
+            <div class="pad2">
+                <img src="@Url.Content("~/img_png/magnus.png")">
+            </div>
+        </div>
+
+        <div class="header_elements">
+            <div class="header_element">
+                <a class="home" href="@Url.Content("~/")">@Localizer["HOME"]</a>
+            </div>
+            <div class="header_element">
+                <a class="home" href="@Url.Content("~/about")">@Localizer["ABOUT PROJECT"]</a>
+            </div>
+            <div class="header_element">
+                <a class="home" href="@Url.Content("~/news")">@Localizer["NEWS"]</a>
+            </div>
+            <div class="header_element">
+                <a class="home" href="@Url.Content("~/events")">@Localizer["EVENTS"]</a>
+            </div>
+            <div class="header_element">
+                <a class="home" href="@Url.Content("~/outcomes")">@Localizer["OUTCOMES"]</a>
+            </div>
+            <div class="header_element">
+                <a class="home" href="@Url.Content("~/partners")">@Localizer["PARTNERS"]</a>
+            </div>
+            @*<div class="header_element">
+                    <a class="home" href="@Url.Content("~/links")">USEFUL</a>
+                </div>
+                <div class="header_element">
+                    <a class="home" href="@Url.Content("~/archive")">BLOG</a>
+                </div>*@
+        </div>
+        <div class="header_lang_dropdown dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a href="@Url.Action("SetLanguage","Setup", new { culture="en-US", returnUrl=url})" class="header_lang_elem_dropdown">
+                    @if ((CultureInfo.CurrentCulture.Name == "ru-RU"))
+                    {
+                        <img src="@Url.Content("~/img_png/flag-rus.png")" class="flag_eng">
+                        <div class="Eng">
+                            Rus
+                        </div>
+                    }
+                    @*else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ"))
+          {
+              <img src="@Url.Content("~/img_png/flag-kaz.png")" class="flag_eng">
+              <div class="Eng">
+                  Aze
+              </div>
+          }*@
+                    else
+                    {
+                        <img src="@Url.Content("~/img_png/flag-eng.png")" class="flag_eng">
+                        <div class="Eng">
+                            Eng
+                        </div>
+                    }
+
+                </a>
+            </button>
+            <div class="dropdown-menu" id="dropdown-menu" aria-labelledby="dropdownMenuButton" style="min-width: 56px;border-radius: unset;">
+                <a href="@Url.Action("SetLanguage","Setup", new { culture="en-US", returnUrl=url })" class="header_lang_elem">
+                    <img src="@Url.Content("~/img_png/flag-eng.png")" class="flag_eng">
+                    <div class="Eng">
+                        Eng
+                    </div>
+                </a>
+                <a href="@Url.Action("SetLanguage","Setup", new { culture="ru-RU", returnUrl=url })" class="header_lang_elem">
+                    <img src="@Url.Content("~/img_png/flag-rus.png")" class="flag_rus">
+                    <div class="Ru">
+                        Rus
+                    </div>
+                </a>
+                @*<a href="@Url.Action("SetLanguage","Setup", new { culture="kk-KZ", returnUrl=url})" class="header_lang_elem">
+                    <img src="@Url.Content("~/img_png/flag-az.png")" class="flag-az">
+                    <div class="Kz">
+                        Aze
+                    </div>
+                </a>*@
+            </div>
+        </div>
+        @*<div class="header_lang">
+                <a href="@Url.Action("SetLanguage","Setup", new { culture="en-US", returnUrl=url})" class="header_lang_elem">
+                    <img src="@Url.Content("~/img_png/flag-eng.png")" class="flag_eng">
+                    <div class="Eng">
+                        Eng
+                    </div>
+                </a>
+                <a href="@Url.Action("SetLanguage","Setup", new { culture="ru-RU", returnUrl=url})" class="header_lang_elem">
+                    <img src="@Url.Content("~/img_png/flag-rus.png")" class="flag_rus">
+                    <div class="Ru">
+                        Ru
+                    </div>
+                </a>
+                <a href="@Url.Action("SetLanguage","Setup", new { culture="kk-KZ", returnUrl=url})" class="header_lang_elem">
+                    <img src="@Url.Content("~/img_png/flag-az.png")" class="flag-az">
+                    <div class="Kz">
+                        Kz
+                    </div>
+                </a>
+            </div>*@
+
+        <div class="menu_big" id="menu_big">
+            <div>
+                <button onclick="sidebar_open()" class="menu_button">
+                    <img src="@Url.Content("~/img_png/ic-menu-big.png")">
+                </button>
+            </div>
+        </div>
+
+        <div class="menu_small" id="menu_small">
+            <div>
+                <button onclick="sidebar_open()" class="menu_button">
+                    <img src="@Url.Content("~/img_png/ic-menu.png")">
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="sidebar" style="display:none" id="mySidebar">
+    <div class="header">
+        <div class="case">
+            <div class="logos">
+                <div class="pad">
+                    <img src="@Url.Content("~/img_png/logo-erasmus.png")">
+                </div>
+                <div class="pad2">
+                    <img src="@Url.Content("~/img_png/magnus.png")">
+                </div>
+            </div>
+
+            <div class="logos_small">
+                <div class="pad">
+                    <img src="@Url.Content("~/img_png/logo-erasmus.png")">
+                </div>
+                <div class="pad2">
+                    <img src="@Url.Content("~/img_png/magnus.png")">
+                </div>
+            </div>
+            <div class="menu_big" id="close_big">
+                <div>
+                    <button onclick="sidebar_close()" class="menu_button">
+                        <img src="@Url.Content("~/img_png/ic-close-big.png")">
+                    </button>
+                </div>
+            </div>
+
+            <div class="menu_small" id="close_small">
+                <div>
+                    <button onclick="sidebar_close()" class="menu_button">
+                        <img src="@Url.Content("~/img_png/ic-close.png")">
+                    </button>
+                </div>
+            </div>
+
+            <div class="header_lang_dropdown dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a href="@Url.Action("SetLanguage","Setup", new { culture="en-US", returnUrl=url})" class="header_lang_elem_dropdown">
+                        @if ((CultureInfo.CurrentCulture.Name == "ru-RU"))
+                        {
+                            <img src="@Url.Content("~/img_png/flag-rus.png")" class="flag_eng">
+                            <div class="Eng">
+                                Rus
+                            </div>
+                        }
+                        @*else
+                   if ((CultureInfo.CurrentCulture.Name == "kk-KZ"))
+                        {
+                            <img src="@Url.Content("~/img_png/flag-kaz.png")" class="flag_eng">
+                            <div class="Eng">
+                                Aze
+                            </div>
+                        }*@
+                        else
+                        {
+                            <img src="@Url.Content("~/img_png/flag-eng.png")" class="flag_eng">
+                            <div class="Eng">
+                                Eng
+                            </div>
+                            @*<img src="@Url.Content("~/img_png/arrow-drop-down.png")" class="flag_eng">*@
+                        }
+
+                    </a>
+                </button>
+                <div class="dropdown-menu" id="dropdown-menu" aria-labelledby="dropdownMenuButton" style="min-width: 56px;border-radius: unset;">
+                    <a href="@Url.Action("SetLanguage","Setup", new { culture="en-US", returnUrl=url })" class="header_lang_elem">
+                        <img src="@Url.Content("~/img_png/flag-eng.png")" class="flag_eng">
+                        <div class="Eng">
+                            Eng
+                        </div>
+                    </a>
+                    <a href="@Url.Action("SetLanguage","Setup", new { culture="ru-RU", returnUrl=url })" class="header_lang_elem">
+                        <img src="@Url.Content("~/img_png/flag-rus.png")" class="flag_rus">
+                        <div class="Ru">
+                            Rus
+                        </div>
+                    </a>
+                    @*<a href="@Url.Action("SetLanguage","Setup", new { culture="kk-KZ", returnUrl=url})" class="header_lang_elem">
+                        <img src="@Url.Content("~/img_png/flag-az.png")" class="flag-az">
+                        <div class="Kz">
+                            Aze
+                        </div>
+                    </a>*@
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar_element">
+        <div class="arrow">
+            <i class="fa fa-caret-right"></i>
+        </div>
+        <a class="home" href="@Url.Content("~/")">@Localizer["HOME"]</a>
+    </div>
+    <div class="sidebar_element">
+        <div class="arrow">
+            <i class="fa fa-caret-right"></i>
+        </div>
+        <a class="home" href="@Url.Content("~/about")">@Localizer["ABOUT PROJECT"]</a>
+    </div>
+    <div class="sidebar_element">
+        <div class="arrow">
+            <i class="fa fa-caret-right"></i>
+        </div>
+        <a class="home" href="@Url.Content("~/news")">@Localizer["NEWS"]</a>
+    </div>
+    <div class="sidebar_element">
+        <div class="arrow">
+            <i class="fa fa-caret-right"></i>
+        </div>
+        <a class="home" href="@Url.Content("~/events")">@Localizer["EVENTS"]</a>
+    </div>
+
+    @foreach (var peer in peerPages@*.Where(x => !x.Behavior?.IsHiddenInMenu?.Value ?? false)*@)
+{
+@if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (peer.Languages.RusTitle.Value != null))
+{
+    <div class="sidebar_subelement">
+        <a href="@Url.Content(peer.Permalink)">@peer.Languages.RusTitle</a>
+    </div>
+}
+@*else
+if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (peer.Languages.KazTitle.Value != null))
+{
+    <div class="sidebar_subelement">
+        <a href="@Url.Content(peer.Permalink)">@peer.Languages.KazTitle</a>
+    </div>
+}*@
+else
+{
+    <div class="sidebar_subelement">
+        <a class="home" href="@Url.Content(peer.Permalink)">@peer.Title</a>
+    </div>
+}
+
+}
+    <div class="sidebar_element">
+        <div class="arrow">
+            <i class="fa fa-caret-right"></i>
+        </div>
+        <a class="home" href="@Url.Content("~/outcomes")">@Localizer["OUTCOMES"]</a>
+    </div>
+    @foreach (var outcome in outcomesPages)
+    {
+        @if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (outcome.Regions.Languages.RusTitle.Value != null))
+        {
+            <div class="sidebar_subelement">
+                <a href="@Url.Content(outcome.Permalink)">@outcome.Regions.Languages.RusTitle</a>
+            </div>
+        }
+        @*else
+if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (outcome.Regions.Languages.KazTitle.Value != null))
+        {
+            <div class="sidebar_subelement">
+                <a href="@Url.Content(outcome.Permalink)">@outcome.Regions.Languages.KazTitle</a>
+            </div>
+        }*@
+        else
+        {
+            <div class="sidebar_subelement">
+                <a class="home" href="@Url.Content(outcome.Permalink)">@outcome.Title</a>
+            </div>
+        }
+    }
+    <div class="sidebar_element">
+        <div class="arrow">
+            <i class="fa fa-caret-right"></i>
+        </div>
+        <a class="home" href="@Url.Content("~/partners")">@Localizer["PARTNERS"]</a>
+    </div>
+    @*<div class="sidebar_element">
+            <div class="arrow">
+                <i class="fa fa-caret-right"></i>
+            </div>
+            <a class="home" href="@Url.Content("~/links")">USEFUL</a>
+        </div>
+        <div class="sidebar_element">
+            <div class="arrow">
+                <i class="fa fa-caret-right"></i>
+            </div>
+            <a class="home" href="@Url.Content("~/archive")">BLOG</a>
+        </div>*@
+</div>

@@ -1,0 +1,75 @@
+﻿@model DynamicPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var actualPage = await Api.Pages.GetByIdAsync<LinksPage>(Model.Id);
+}
+
+@{
+    ViewBag.Title = @Model.Title;
+
+    var Title = "";
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (actualPage.Languages.RusTitle.Value != null))
+    {
+        Title = actualPage.Languages.RusTitle;
+    }
+    else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (actualPage.Languages.KazTitle.Value != null))
+    {
+        Title = actualPage.Languages.KazTitle;
+    }
+    else
+    {
+        Title = actualPage.Title;
+    }
+}
+
+<div class="links">
+    <div class="case">
+        <div class="links_text">
+            <div class="links_text_title">
+                @Title
+            </div>
+            <div class="links_text_body">
+
+                @foreach (var link in actualPage.Links)
+                {
+                    <div>
+                        @link.Title
+                    </div>
+                    <div>
+                        <a href="@link.Url">@link.Url</a>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (actualPage.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPage.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Title
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

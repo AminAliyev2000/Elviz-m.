@@ -1,0 +1,201 @@
+﻿@model OutcomesPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+
+    var sitemap = await Api.Sites.GetSitemapAsync(Model.SiteId);
+    var children = sitemap.GetPartial(Model.Id);
+
+    //var resourceCentres = await Api.Pages.GetAllAsync<ResourceCentrePage>();
+    //foreach (var child in children)
+    //{
+    //    var centre = await Api.Pages.GetAllAsync<ResourceCentrePage>();
+
+    //    if (centre == null)
+    //    {
+    //        continue;
+    //    }
+    //    centres.Add(centre);
+    //}
+
+    //var centersPage = (await Api.Pages.GetAllAsync<CentersPage>()).FirstOrDefault();
+
+    var peerPages = (await Api.Pages.GetAllAsync()).Where(p => p.ParentId == Model.Id);
+}
+
+@{
+    ViewBag.Title = Model.Title;
+
+    var Title = "";
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (Model.Languages.RusTitle.Value != null))
+    {
+        Title = Model.Languages.RusTitle;
+    }
+    else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (Model.Languages.KazTitle.Value != null))
+    {
+        Title = Model.Languages.KazTitle;
+    }
+    else
+    {
+        Title = Model.Title;
+    }
+}
+
+<div class="outcomes">
+    <div class="case">
+        <div class="outcomes_text">
+            <div class="outcomes_text_title">
+                @Title
+            </div>
+            <div class="outcomes_text_body">
+                @foreach (var point in Model.OutcomePoints)
+                {
+                    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (point?.TitleRus?.Value != null))
+                    {
+                        <div class="card" style="background-color:@point?.Color?.Value">
+                            <div class="image">
+                                <img src="@Url.Content(point?.Image?.Media?.PublicUrl)">
+                            </div>
+                            <div class="title">
+                                @point.TitleRus
+                            </div>
+                            <div class="text">
+                                @Html.Raw(point?.ContentRus?.Value)
+                            </div>
+                            <div class="outcomes_buttons">
+                                <button class="button" onclick="location.href='@point?.Url?.Value'" onmouseover="change_color('@point?.Color?.Value' )" onmouseout="unchange_color()" style="background-color:@point?.Color?.Value;color:#ffffff;border: 1px solid #ffffff" name="learn_button" data-color="@point?.Color?.Value">
+                                    <div>
+                                        @Localizer["LEARN MORE"]
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (point?.TitleKaz?.Value != null))
+                    {
+                        <div class="card" style="background-color:@point?.Color?.Value">
+                            <div class="image">
+                                <img src="@Url.Content(point?.Image?.Media?.PublicUrl)">
+                            </div>
+                            <div class="title">
+                                @point.Title
+                            </div>
+                            <div class="text">
+                                @Html.Raw(point?.ContentKaz.Value)
+                            </div>
+                            <div class="outcomes_buttons">
+                                <button class="button" onclick="location.href='@point?.Url?.Value'" onmouseover="change_color('@point?.Color?.Value' )" onmouseout="unchange_color()" style="background-color:@point?.Color?.Value;color:#ffffff;border: 1px solid #ffffff" name="learn_button" data-color="@point?.Color?.Value">
+                                    <div>
+                                        @Localizer["LEARN MORE"]
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card" style="background-color:@point.Color.Value">
+                            <div class="image">
+                                <img src="@Url.Content(point?.Image?.Media?.PublicUrl)">
+                            </div>
+                            <div class="title">
+                                @point.Title
+                            </div>
+                            <div class="text">
+                                @Html.Raw(point.Content)
+                            </div>
+                            <div class="outcomes_buttons">
+                                <button class="button" onclick="location.href='@point?.Url?.Value'" onmouseover="change_color('@point?.Color?.Value' )" onmouseout="unchange_color()" style="background-color:@point?.Color?.Value;color:#ffffff;border: 1px solid #ffffff" name="learn_button" data-color="@point?.Color?.Value">
+                                    <div>
+                                        @Localizer["LEARN MORE"]
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function change_color(colorNew) {
+        var allButtons = document.getElementsByName('learn_button');
+        for (var i = 0; i < allButtons.length; i++) {
+            if ((allButtons[i].dataset.color.localeCompare(colorNew)) == 0) {
+                allButtons[i].style.backgroundColor = '#ffffff';
+                allButtons[i].style.color = colorNew;
+            }
+        }
+    }
+
+    function unchange_color() {
+        var allButtons = document.getElementsByName('learn_button');
+        for (var i = 0; i < allButtons.length; ++i) {
+            allButtons[i].style.backgroundColor = allButtons[i].dataset.color;
+            allButtons[i].style.color = "#ffffff";
+        }
+    }
+</script>
+
+@if (Model.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(Model.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Title
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+@section subheader {
+    <div class="subheader">
+        <div class="case">
+            <div class="subheader_elements">
+                @foreach (var peerPage in peerPages)
+                {
+                    @if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (peerPage.Regions.Languages.RusTitle.Value != null))
+                    {
+                        <div class="subheader_element">
+                            <a href="@Url.Content(peerPage.Permalink)">@peerPage.Regions.Languages.RusTitle</a>
+                        </div>
+
+                    }
+                    else
+if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (peerPage.Regions.Languages.KazTitle.Value != null))
+                    {
+                        <div class="subheader_element">
+                            <a href="@Url.Content(peerPage.Permalink)">@peerPage.Regions.Languages.KazTitle</a>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <div class="subheader_element">
+                            <a href="@Url.Content(peerPage.Permalink)">@peerPage.Title</a>
+                        </div>
+
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}

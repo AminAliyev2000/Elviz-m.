@@ -1,0 +1,83 @@
+﻿@using Microsoft.AspNetCore.Builder
+@using Microsoft.AspNetCore.Http.Features
+@using Microsoft.Extensions.Options
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500">
+    <link href="/css/lightbox.css" rel="stylesheet" />
+    <link rel="stylesheet" href="@Url.Content("~/style.min.css?")@Guid.NewGuid()">
+
+    <title>@ViewBag.Title</title>
+
+    @if (Model is Piranha.Models.IMeta)
+    {
+        <partial name="Partial/_Meta.cshtml" />
+    }
+
+    @RenderSection("head", required: false)
+</head>
+<body>
+    <partial name="Partial/_Menu.cshtml" />
+
+    @*<form asp-controller="Setup" asp-action="SetLanguage" style="margin-top:20px;"
+              asp-route-returnUrl="@Context.Request.Path"
+              method="post" class="form-horizontal">
+            @Localizer["Language:"] <select name="culture" onchange="this.form.submit();"
+                                            asp-for="@requestCulture.RequestCulture.UICulture.Name"
+                                            asp-items="cultureItems"></select>
+        </form>*@
+
+    @RenderSection("subheader", required: false)
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="body_bg_authorized">
+            @*<partial name="Partial/_UserInfo.cshtml" />*@
+            @RenderSection("banner", false)
+            @RenderSection("page_banner", false)
+            @RenderBody()
+            <partial name="Partial/_Footer.cshtml" />
+        </div>
+    }
+    else
+    {
+        <div class="body_bg">
+            @RenderSection("banner", false)
+            @RenderSection("page_banner", false)
+            @RenderBody()
+            <partial name="Partial/_Footer.cshtml" />
+        </div>
+    }
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="~/js/lightbox-plus-jquery.js"></script>
+
+    @RenderSection("script", required: false)
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (m, e, t, r, i, k, a) {
+            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+            m[i].l = 1 * new Date(); k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+        })
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(54610204, "init", {
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/54610204" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+</body>
+</html>

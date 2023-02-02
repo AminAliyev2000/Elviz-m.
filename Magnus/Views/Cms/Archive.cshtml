@@ -1,0 +1,179 @@
+@model BlogArchive
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var sitemap = await Api.Posts.GetAllBySiteIdAsync<BlogPost>(Model.SiteId);
+    var actualPost = await Api.Pages.GetByIdAsync<BlogArchive>(Model.Id);
+    var posts = new List<BlogPost>();
+    foreach (var child in sitemap)
+    {
+        var item = await Api.Posts.GetByIdAsync<BlogPost>(child.Id);
+
+        if (item == null)
+        {
+            continue;
+        }
+        posts.Add(item);
+    }
+}
+
+@{
+    ViewBag.Title = @Model.Title;
+}
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        tinyMCE.init({
+            selector: '#txtEditor',
+            mode: "textareas",
+            theme: "modern",
+            height: 91,
+            // Theme options
+            theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+            theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+            theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+            theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+            theme_advanced_toolbar_location: "top",
+            theme_advanced_toolbar_align: "left",
+            theme_advanced_statusbar_location: "bottom",
+            theme_advanced_resizing: true,
+
+        });
+    });
+</script>
+
+<div class="archive">
+    <div class="case">
+        <div class="archive_text">
+            <div class="archive_text_title">
+                <div>
+                    @Model.Title
+                </div>
+                @if (User.IsInRole("SysAdmin") || User.IsInRole("Blogger"))
+                {
+                    <div class="add_post">
+                        <button class="button">
+                            <div class="open_modal">
+                                @Localizer["ADD POST"]
+                            </div>
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <div id="wrapper" class="wrapper">
+                <div class="cover" style="display: none;"></div>
+                <div class="modal" style="display: none;">
+                    <div class="content" style="display: none;">
+                        <div class="content_title">
+                            <div class="title">
+                                @Localizer["Post"]
+                            </div>
+                            <div class="close">
+                                <a class="close-modal"><img src="@Url.Content("~/img_png/close.png")" /></a>
+                            </div>
+                        </div>
+                        <div class="content_form">
+                            @using (Html.BeginForm("Add", "Cms", new { blogId = Model.Id }, FormMethod.Post))
+                            {
+                                @Html.ValidationSummary(true);
+                                <div class="form_element">
+                                    <div class="form_label">Title</div>
+                                    @Html.TextBox("Title", "", null, new { required = "required" })
+                                </div>
+                                <div class="form_element">
+                                    <div class="form_label">Message</div>
+                                    @Html.TextArea("Body", new { Id = "txtEditor", @class = "tinymce" })
+                                </div>
+                                <div class="send" style="padding-top:0px;">
+                                    <button type="submit" value="Submit" class="button">
+                                        <div>
+                                            @Localizer["SAVE"]
+                                        </div>
+                                    </button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            @foreach (var post in posts)
+            {
+                <div class="archive_text_body">
+                    <div class="date">
+                        @post.Created.ToShortDateString()
+                    </div>
+                    <div class="text">
+                        <div class="title">
+                            @post.Title
+                            @if (post.Comments.Count != 0)
+                            {
+                                <span class="archive_comment_count">+@post.Comments.Count</span>
+                            }
+                        </div>
+                        <div class="fragment">
+                            @Html.Raw(post.Body)
+                        </div>
+                        <div class="post_footer">
+                            <div class="read_more">
+                                <a href="@Url.Content(post.Permalink)">
+                                    <div>
+                                        Read more
+                                    </div><div>
+                                        <img src="@Url.Content("~/img_png/ic-arrow-blue.png")">
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="author">
+                                @Html.Raw(post.Author)
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    var wrap = $('#wrapper'),
+        btn = $('.button'),
+        modal = $('.cover, .modal, .content');
+
+    btn.on('click', function () {
+        modal.fadeIn();
+    });
+
+    var closeBtn = $('.close-modal');
+    closeBtn.click(function () {
+        modal.fadeOut();
+    });
+</script>
+
+@if (Model.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(Model.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Localizer["BLOG"]
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        @Localizer["Welcome"], @User.Identity.Name
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

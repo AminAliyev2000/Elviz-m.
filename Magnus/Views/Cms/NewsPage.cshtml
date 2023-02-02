@@ -1,0 +1,139 @@
+﻿@model DynamicPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var actualPage = await Api.Pages.GetByIdAsync<NewsPage>(Model.Id);
+    var sitemap = await Api.Pages.GetAllAsync(Model.SiteId);
+
+    var pages = new List<ArticlePage>();
+    foreach (var child in sitemap)
+    {
+        var item = await Api.Pages.GetByIdAsync<ArticlePage>(child.Id);
+
+        if (item == null)
+        {
+            continue;
+        }
+        pages.Add(item);
+    }
+
+    var Title = "";
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU"))
+    {
+        pages = pages.Where(x => x.Language.Russian).ToList();
+        if (actualPage.Languages.RusTitle.Value != null)
+        {
+            Title = actualPage.Languages.RusTitle;
+        }
+        else
+        {
+            Title = actualPage.Title;
+        }
+    }
+    else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ"))
+    {
+        pages = pages.Where(x => x.Language.Kazakhstan).ToList();
+        if (actualPage.Languages.KazTitle.Value != null)
+        {
+            Title = actualPage.Languages.KazTitle;
+        }
+        else
+        {
+            Title = actualPage.Title;
+        }
+    }
+    else
+    {
+        Title = actualPage.Title;
+        pages = pages.Where(x => x.Language.English || (!x.Language.Russian && !x.Language.Kazakhstan)).ToList();
+    }
+}
+
+@{
+    ViewBag.Title = @Model.Title;
+}
+
+<div class="news">
+    <div class="case">
+        <div class="news_text">
+            <div class="news_text_title">
+                @Title
+            </div>
+            @foreach (var article in pages)
+            {
+                <div class="news_text_body">
+                    <div class="news_text_body_image">
+                        <img src="@Url.Content(article.Image)">
+                    </div>
+                    <div class="news_text_body_text">
+                        @if (article.Date.Value != null)
+                        {
+                            <div class="labels">
+                                <div class="date">
+                                    @article?.Date?.Value?.ToShortDateString()
+                                </div>
+                                @if (article.Tags.Value != null)
+                                {
+                                    <div class="devider">
+                                        |
+                                    </div>
+
+                                    @foreach (var tag in article.GetTags())
+                                    {
+                                        <div class="tag">
+                                            @tag
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                        <div class="title">
+                            @article.Title
+                        </div>
+                        <div class="text">
+                            @Html.Raw(article.Brief)
+                        </div>
+                        <div class="read_more">
+                            <a href="@Url.Content(article.Permalink)">
+                                <div>
+                                    @Localizer["Read more"]
+                                </div><div>
+                                    <img src="@Url.Content("~/img_png/ic-arrow-blue.png")">
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@if (actualPage.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPage.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Title
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

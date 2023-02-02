@@ -1,0 +1,157 @@
+﻿@model DynamicPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewBag.Title = Model.Title;
+    var actualPage = await Api.Pages.GetByIdAsync<LabsPage>(Model.Id);
+
+    var peerPages = (await Api.Pages.GetAllAsync()).Where(p => p.ParentId == Model.ParentId);
+
+    var Title = "";
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (actualPage.Languages.RusTitle.Value != null))
+    {
+        Title = actualPage.Languages.RusTitle;
+    }
+    else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (actualPage.Languages.KazTitle.Value != null))
+    {
+        Title = actualPage.Languages.KazTitle;
+    }
+    else
+    {
+        Title = Model.Title;
+    }
+}
+
+<div class="labs">
+    <div class="case">
+        <div class="labs_text">
+            <div class="title">
+                @Title
+            </div>
+            <div class="body">
+                <div class="textfield">
+                    @if (CultureInfo.CurrentCulture.Name == "ru-RU")
+                    {
+                        @Html.Raw(actualPage.Languages.RusContent?.Value)
+                    }
+                    else if (CultureInfo.CurrentCulture.Name == "kk-KZ")
+                    {
+                        @Html.Raw(actualPage.Languages.KazContent?.Value)}
+                    else
+                    {
+                        @Html.DisplayFor(x => actualPage.Blocks)
+                    }
+                </div>
+                @if (actualPage.Labs.Count != 0)
+                {
+                    @*<div class="subtitle">
+                        @Localizer["Representations"]
+                    </div>*@
+                    <div class="photos">
+                        @foreach (var center in actualPage.Labs)
+                        {
+                            <div class="photo" name="center_city" data-countrycode="@center.City">
+                                <img src="@Url.Content(center.Image)">
+                                <div class="photo_overlay">
+                                    <a class="text" href="@center.Url.Value">@center.City</a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (actualPage.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPage.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Localizer["OUTCOMES"]
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        <a href="@Url.Content("/outcomes")"> @Localizer["OUTCOMES"]</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section subheader {
+    <div class="subheader">
+        <div class="case">
+            <div class="subheader_elements">
+                @foreach (var peerPage in peerPages)
+                {
+                    @if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (peerPage.Regions.Languages.RusTitle.Value != null))
+                    {
+                        @if (peerPage.Permalink == actualPage.Permalink)
+                        {
+                            <div class="subheader_element" style="background-color:#e9463f;">
+                                <a style="color:#ffffff;padding: 8px 12px 4px 12px;" href="@Url.Content(peerPage.Permalink)">@peerPage.Regions.Languages.RusTitle</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="subheader_element">
+                                <a href="@Url.Content(peerPage.Permalink)">@peerPage.Regions.Languages.RusTitle</a>
+                            </div>
+                        }
+                    }
+                    else
+if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (peerPage.Regions.Languages.KazTitle.Value != null))
+                    {
+                        @if (peerPage.Permalink == actualPage.Permalink)
+                        {
+                            <div class="subheader_element" style="background-color:#e9463f;">
+                                <a style="color:#ffffff;padding: 8px 12px 4px 12px;" href="@Url.Content(peerPage.Permalink)">@peerPage.Regions.Languages.KazTitle</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="subheader_element">
+                                <a href="@Url.Content(peerPage.Permalink)">@peerPage.Regions.Languages.KazTitle</a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @if (peerPage.Permalink == actualPage.Permalink)
+                        {
+                            <div class="subheader_element" style="background-color:#e9463f;">
+                                <a style="color:#ffffff;padding: 8px 12px 4px 12px;" href="@Url.Content(peerPage.Permalink)">@peerPage.Title</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="subheader_element">
+                                <a href="@Url.Content(peerPage.Permalink)">@peerPage.Title</a>
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}

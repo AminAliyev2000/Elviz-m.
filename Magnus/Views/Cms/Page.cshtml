@@ -1,0 +1,13 @@
+@model StandardPage
+
+@{
+    ViewBag.Title = @Model.Title;
+}
+
+<div class="bread_crumbs">
+    <div class="bread_crumbs_text">
+        <h1>@Model.Title</h1>
+
+        @Html.DisplayFor(m => m.Blocks)
+    </div>
+</div>

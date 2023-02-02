@@ -1,0 +1,255 @@
+﻿@model PartnersPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var actualPage = await Api.Pages.GetByIdAsync<PartnersPage>(Model.Id);
+    ViewBag.Title = @Model.Title;
+
+    var Title = "";
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (Model.Languages.RusTitle.Value != null))
+    {
+        Title = Model.Languages.RusTitle;
+    }
+    else
+        if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (Model.Languages.KazTitle.Value != null))
+    {
+        Title = Model.Languages.KazTitle;
+    }
+    else
+    {
+        Title = Model.Title;
+    }
+}
+
+<div class="partners">
+    <div class="case">
+        <div class="partners_text">
+            <div class="partners_text_title">
+                @Title
+            </div>
+            <div class="partners_text_body">
+
+                @foreach (var partner in Model.Partners)
+                {
+
+                    <div class="partner" name="partner_country" data-countrycode="@partner.CountryCode">
+
+                        <div class="logo">
+                            <img src="@Url.Content(partner.Logo.Resize(Api, 210, null))">
+                        </div>
+                        <div class="link">
+                            @if (CultureInfo.CurrentCulture.Name == "ru-RU")
+                            {
+                                <a href="@partner.Url.Value"><b><u>@partner.UniversityRus?.Value (@partner.UniversityAbr)</u></b></a>
+                            }
+                            else
+                         if (CultureInfo.CurrentCulture.Name == "kk-KZ")
+                            {
+                                <a href="@partner.Url.Value"><b><u>@partner.UniversityKaz?.Value (@partner.UniversityAbr)</u></b></a>
+                            }
+                            else
+                            {
+                                <a href="@partner.Url.Value"><b><u>@partner.University (@partner.UniversityAbr)</u></b></a>
+                            }
+
+                            @if (partner.IsCoordinating)
+                            {
+                                <br />@:Coordinator Partner
+                            }
+                        </div>
+                        <div>
+                            @if (CultureInfo.CurrentCulture.Name == "ru-RU")
+                            {
+                                @partner.CountryRus?.Value
+                            }
+                            else if (CultureInfo.CurrentCulture.Name == "ru-RU")
+                            {
+                                @partner.CountryKaz?.Value
+                            }
+                            else
+                            {
+                                @partner.Country
+                            }
+                        </div>
+                        <div class="email">
+                            @if (partner.Person?.Value != null)
+                            {
+                                <div>
+                                    <b>@Localizer["Contact person"]:</b> @partner.Person?.Value
+                                </div>
+                                <br />
+                            }
+                            <div>
+                                @partner.Email
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="map_bg">
+        <div class="map">
+            <div class="title"></div>
+            <div class="body" id="regions_div"></div>
+        </div>
+    </div>
+    <div id="map"></div>
+    <script>
+
+        function initMap() {
+            var linkoping = { lat: 58.41, lng: 15.63 };
+            var rostov = { lat: 47.22, lng: 39.72 };
+            var derby = { lat: 52.92, lng: -1.48 };
+            var tomar = { lat: 39.60, lng: -8.40 };
+            var tallinn = { lat: 59.43, lng: 24.74 };
+            var voronezh = { lat: 51.66, lng: 39.2 };
+            var astrakhan = { lat: 46.34, lng: 48.03 };
+            var baku = { lat: 40.36, lng: 49.83 };
+
+            var map = new google.maps.Map(document.getElementById('regions_div'), {
+                zoom: 3,
+                center: rostov,
+                disableDefaultUI: true
+            });
+
+            var markers = [];
+
+            markers.push(new google.maps.Marker({
+                position: linkoping,
+                map: map,
+                title: 'Linkoping',
+                label: 'Linkoping',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(-32, 12),
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: rostov,
+                map: map,
+                title: 'Rostov-on-Don',
+                label: 'Rostov-on-Don',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(-47, 12)
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: derby,
+                map: map,
+                title: 'Derby',
+                label: 'Derby',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(48, 12)
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: tomar,
+                map: map,
+                title: 'Tomar',
+                label: 'Tomar',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(50, 12)
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: tallinn,
+                map: map,
+                title: 'Tallinn',
+                label: 'Tallinn',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(54, 12)
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: voronezh,
+                map: map,
+                title: 'Voronezh',
+                label: 'Voronezh',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(60, 12)
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: astrakhan,
+                map: map,
+                title: 'Astrakhan',
+                label: 'Astrakhan',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(64, 12)
+                },
+            }));
+
+            markers.push(new google.maps.Marker({
+                position: baku,
+                map: map,
+                title: 'Baku',
+                label: 'Baku',
+                icon: {
+                    url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    labelOrigin: new google.maps.Point(44, 12)
+                },
+            }));
+
+            markers.forEach((marker) => {
+                marker.addListener('click', function () {
+                var el = document.getElementsByName("partner_country");
+
+                for (var j = 0; j <@Model.Partners.Count(); j++) {
+                    if (el[j].dataset.countrycode != marker.title) {
+                        el[j].style.opacity = "0.3";
+                    }
+                    else {
+                        el[j].style.opacity = "1";
+                    }
+                }
+            });
+            })
+
+            var styles = [{ "featureType": "administrative", "elementType": "geometry", "stylers": [{ "visibility": "on" }] }, { "featureType": "administrative.country", "elementType": "geometry", "stylers": [{ "visibility": "on" }] }, { "featureType": "administrative.country", "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "featureType": "administrative.province", "elementType": "geometry", "stylers": [{ "visibility": "off" }] }, { "featureType": "administrative.province", "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "featureType": "administrative.locality", "elementType": "geometry", "stylers": [{ "visibility": "on" }] }, { "featureType": "administrative.locality", "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "featureType": "administrative.neighborhood", "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "featureType": "administrative.land_parcel", "elementType": "labels", "stylers": [{ "visibility": "off" }] }, { "featureType": "landscape", "elementType": "geometry", "stylers": [{ "visibility": "off" }] }, { "featureType": "landscape", "elementType": "geometry.fill", "stylers": [{ "visibility": "off" }] }, { "featureType": "landscape", "elementType": "geometry.stroke", "stylers": [{ "visibility": "off" }] }, { "featureType": "landscape.man_made", "elementType": "geometry", "stylers": [{ "visibility": "off" }] }, { "featureType": "water", "elementType": "labels", "stylers": [{ "visibility": "off" }] }];
+            map.setOptions({ styles: styles });
+        }
+    </script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB5UDYdoZ0JRZJBqXmtnKxjh3eBSx7KMZo&callback=initMap">
+    </script>
+</div>
+
+@if (actualPage.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPage.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Title
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

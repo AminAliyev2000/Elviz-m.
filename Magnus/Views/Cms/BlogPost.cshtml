@@ -1,0 +1,241 @@
+@model BlogPost
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var actualPost = await Api.Posts.GetByIdAsync<BlogPost>(Model.Id);
+    ViewBag.Title = Model.Title;
+}
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        tinyMCE.init({
+            selector: '#txtEditor',
+            mode: "textareas",
+            theme: "modern",
+            height: 91,
+            // Theme options
+            theme_advanced_buttons1: "save,newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,styleselect,formatselect,fontselect,fontsizeselect",
+            theme_advanced_buttons2: "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,|,insertdate,inserttime,preview,|,forecolor,backcolor",
+            theme_advanced_buttons3: "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl,|,fullscreen",
+            theme_advanced_buttons4: "insertlayer,moveforward,movebackward,absolute,|,styleprops,spellchecker,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,blockquote,pagebreak,|,insertfile,insertimage",
+            theme_advanced_toolbar_location: "top",
+            theme_advanced_toolbar_align: "left",
+            theme_advanced_statusbar_location: "bottom",
+            theme_advanced_resizing: true,
+
+        });
+    });
+</script>
+
+@if (User.IsInRole("SysAdmin") || User.IsInRole("Blogger"))
+{
+    <div class="panel">
+        <div class="case">
+            <div class="button_panels">
+
+                <div class="back_to_posts">
+                    <img src="@Url.Content("~/img_png/arrow-back.png")">
+                    <a href="@Url.Content("~/archive")">ALL POSTS</a>
+                </div>
+
+                <div id="wrapper" class="wrapper">
+                    <div class="cover" style="display: none;"></div>
+                    <div class="modal" style="display: none;">
+                        <div class="content" style="display: none;">
+                            <div class="content_title">
+                                <div class="title">
+                                    @Localizer["Post"]
+                                </div>
+                                <div class="close">
+                                    <a class="close-modal"><img src="@Url.Content("~/img_png/close.png")" /></a>
+                                </div>
+                            </div>
+                            <div class="content_form">
+                                @using (Html.BeginForm("Edit", "Cms", new { postId = actualPost.Id }, FormMethod.Post))
+                                {
+                                    @Html.ValidationSummary(true);
+                                    <div class="form_element">
+                                        <div class="form_label">Title</div>
+                                        @Html.TextBoxFor(model => model.Title, new { required = "required" })
+                                    </div>
+                                    <div class="form_element">
+                                        <div class="form_label">Message</div>
+                                        @Html.TextAreaFor(model => model.Body.Value, new { Id = "txtEditor", @class = "tinymce" })
+                                    </div>
+                                    <div class="send" style="padding-top:0px;">
+                                        <button type="submit" value="Submit" class="button">
+                                            <div>
+                                                @Localizer["SAVE"]
+                                            </div>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cnt">
+                        <a class="open-modal-btn">@Localizer["Edit post"]</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="panel">
+        <div class="case">
+            <div class="button_panels">
+                <div class="back_to_posts">
+                    <img src="@Url.Content("~/img_png/arrow-back.png")">
+                    <a href="@Url.Content("~/archive")">@Localizer["ALL POSTS"]</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="article">
+    <div class="case">
+        <div class="article_title">
+            <div class="title">
+                @actualPost.Title
+            </div>
+            <div style="display:grid;justify-items:center;">
+                <div class="post_labels">
+                    <div class="date">
+                        @actualPost.Created.ToShortDateString()
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="article_text" id="postText">
+            @Html.Raw(actualPost.Body)
+        </div>
+        @*<div id="editor" style="display:none">
+                @using (Html.BeginForm("Edit", "Cms", new { postId = actualPost.Id }, FormMethod.Post))
+                {
+                    @Html.ValidationSummary(true);
+                    @Html.TextAreaFor(model => model.Body.Value, new { Id = "txtEditor", @class = "tinymce" });
+                    <div class="send">
+                        <button type="submit" value="Submit" class="button">
+                            <div>
+                                EDIT
+                            </div>
+                        </button>
+                    </div>
+                }
+            </div>*@
+        <div class="blog_comments">
+            <div class="title">
+                <div class="comment_count">
+                    <div>
+                        <img src="@Url.Content("~/img_png/ic-write.png")">
+                    </div>
+                    <div>
+                        @Model.Comments.Count Comments
+                    </div>
+                </div>
+                @*<div class="blog_comment_share">
+                        <div>
+                            Share
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-facebook.png")">
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-twitter.png")">
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-vk.png")">
+                        </div>
+                    </div>*@
+            </div>
+            @foreach (var comment in @Model.Comments)
+            {
+                <div class="comment">
+                    <div class="name">
+                        @comment.Name
+                    </div>
+                    <div class="date">
+                        @comment.Date.Value
+                    </div>
+                    <div class="text">
+                        @comment.Text
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="blog_comments_write">
+            <div class="title">
+                Leave a comment
+            </div>
+            @using (Html.BeginForm("Comment", "Cms", new { postId = actualPost.Id, userName = User.Identity.Name }, FormMethod.Post, null, new { @class = "comment_form" }))
+            {
+                <div class="textarea">
+                    @Html.TextArea("COMMENT", "", new { @placeholder = "COMMENT", required = "required" })
+                </div>
+                <div class="send">
+                    <button type="submit" class="button">
+                        <div>
+                            @Localizer["SEND"]
+                        </div>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function editPost() {
+        if (document.getElementById("postText").style.display != "none") {
+            document.getElementById("postText").style.display = "none";
+            document.getElementById("editor").style.display = "block";
+        } else {
+            document.getElementById("postText").style.display = "block";
+            document.getElementById("editor").style.display = "none";
+
+        }
+    }
+</script>
+<script>
+    var wrap = $('#wrapper'),
+        btn = $('.open-modal-btn'),
+        modal = $('.cover, .modal, .content');
+
+    btn.on('click', function () {
+        modal.fadeIn();
+    });
+
+    var closeBtn = $('.close-modal');
+    closeBtn.click(function () {
+        modal.fadeOut();
+    });
+</script>
+
+@if (actualPost.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPost.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Localizer["BLOG"]
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        @Localizer["Welcome"], @User.Identity.Name
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

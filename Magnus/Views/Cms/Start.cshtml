@@ -1,0 +1,109 @@
+﻿@model StartPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    ViewBag.Title = @Model.Title;
+
+    var Title = "";
+    var Description = "";
+    var About = "";
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (Model.Languages.RusTitle.Value != null))
+    {
+        Title = Model.Languages.RusTitle;
+    }
+    else if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (Model.Languages.KazTitle.Value != null))
+    {
+        Title = Model.Languages.KazTitle;
+    }
+    else
+    {
+        Title = Model.Title;
+    }
+
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (Model.Languages.RusDescription.Value != null))
+    {
+        Description = Model.Languages.RusDescription;
+    }
+    else if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (Model.Languages.KazDescription.Value != null))
+    {
+        Description = Model.Languages.KazDescription;
+    }
+    else
+    {
+        Description = Model.Description;
+    }
+
+    if ((CultureInfo.CurrentCulture.Name == "ru-RU") && (Model.Languages.RusAbout.Value != null))
+    {
+        About = Model.Languages.RusAbout;
+    }
+    else if ((CultureInfo.CurrentCulture.Name == "kk-KZ") && (Model.Languages.KazAbout.Value != null))
+    {
+        About = Model.Languages.KazAbout;
+    }
+    else
+    {
+        About = Model.About.Text;
+    }
+}
+
+<div class="bread_crumbs">
+    <div class="case">
+        <div class="bread_crumbs_text">
+            <div class="bread_crumbs_text_title">
+                @*<span style="font-family:OswaldRegular">@Title</span>*@
+            </div>
+            <div class="bread_crumbs_text_body">
+                @Html.Raw(Description)
+            </div>
+        </div>
+    </div>
+
+    <div class="project">
+        <div class="project_columns">
+            <div class="case">
+                <div class="project_text">
+                    <div class="project_text_title">
+                        @Localizer["ABOUT PROJECT"]
+                    </div>
+                    <div class="project_text_body">
+                        @Html.Raw(About)
+                    </div>
+                    <div class="learn_more" style="justify-items:baseline;">
+                        <button class="button" onclick="location.href='@Url.Content("~/about")'">
+                            <div>
+                                @Localizer["LEARN MORE"]
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="project_img" style="background-image: url(@Url.Content(Model.About.Image));">
+        </div>
+    </div>
+</div>
+
+@if (Model.Banner.HasValue)
+{
+    @section banner {
+        <div class="banner" style="background-image: url(@Url.Content(Model.Banner.Resize(Api, 1920, null)));">
+            <div class="banner_text">
+                <div class="title">
+                    <div class="title_text">
+                        ERASMUS+ MAG<span style="font-family:OswaldLight">n</span>US
+                    </div>
+                </div>
+                <div class="subtitle">
+                    @Localizer["DEVELOPING MASTER'S PROGRAMMES IN MOBILE APPLICATIONS AND GAME DESIGN AT PARTNER UNIVERSITIES"]
+                </div>
+                <div class="additional">
+                    @Localizer["Coordinator: Linköping University"]<br>
+                </div>
+            </div>
+        </div>
+    }
+}

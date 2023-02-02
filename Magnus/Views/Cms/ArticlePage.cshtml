@@ -1,0 +1,120 @@
+﻿@model DynamicPage
+@inject IApi Api
+@using System.Globalization;
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+
+@{
+    var actualPage = await Api.Pages.GetByIdAsync<ArticlePage>(Model.Id);
+}
+
+<div class="article">
+    <div class="case">
+        <div class="article_title">
+            <div class="title">
+                @actualPage?.Title
+            </div>
+            @if (actualPage.Date.Value != null)
+            {
+                <div style="display:grid;justify-items:center;">
+                    <div class="labels">
+                        <div class="date">
+                            @actualPage?.Date?.Value?.ToShortDateString()
+                        </div>
+                        @if (actualPage.Tags.Value != null)
+                        {
+                            <div class="devider">
+                                |
+                            </div>
+                            @foreach (var tag in actualPage.GetTags())
+                            {
+                                <div class="tag">
+                                    @tag
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            <div style="display: grid;justify-items: center;">
+                <img src="@Url.Content(actualPage.Image)">
+            </div>
+        </div>
+        <div class="article_text">
+            @*@Html.DisplayFor(x => actualPage.Blocks)*@
+            @foreach (var block in actualPage.Blocks)
+            {
+                if (block.Type == typeof(HtmlBlock).FullName)
+                {
+                    <div>
+                        @Html.Raw(((HtmlBlock)block).Body)
+                    </div>
+                }
+                if (block.Type == typeof(TextBlock).FullName)
+                {
+                    <div style="padding-bottom:15px;">
+                        @Html.Raw(((TextBlock)block).Body)
+                    </div>
+                }
+                else if (block.Type == typeof(QuoteBlock).FullName)
+                {
+                    <div style="background-color:#f2f2f2; padding:15px;">
+                        @Html.Raw(((QuoteBlock)block).Body)
+                    </div>
+                }
+                else
+                {
+                    Html.DisplayFor(x => block);
+                }
+            }
+        </div>
+        <div class="article_comments">
+            <div class="title">
+                <div class="comment_share">
+                    @*<div>
+                            Share
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-facebook.png")">
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-twitter.png")">
+                        </div>
+                        <div>
+                            <img src="@Url.Content("~/img_png/ic-share-vk.png")">
+                        </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (actualPage.Banner.HasValue)
+{
+    @section page_banner {
+        <div class="page_banner" style="background-image: url(@Url.Content(actualPage.Banner.Resize(Api, 1920, null)));">
+            <div class="text">
+                <div class="title">
+                    @Localizer["News"]
+                </div>
+                <div class="subtitle">
+                    <div class="body">
+                        <a href="@Url.Content("/home")">ERASMUS+ MAGnUS</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        <a href="@Url.Content("/news")">@Localizer["News"].Value.ToUpperInvariant()</a>
+                    </div>
+                    <div class="ic_arrow">
+                        <i class="fa fa-angle-right"></i>
+                    </div>
+                    <div class="body">
+                        @Model.Title.ToUpperInvariant()
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
